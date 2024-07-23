@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -21,14 +19,12 @@ type weatherData struct {
 }
 
 func loadApiConfig(filename string) (apiConfigData, error) {
-	bytes, err := ioutil.ReadFile(filename)
-
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return apiConfigData{}, err
 	}
 
 	var c apiConfigData
-
 	err = json.Unmarshal(bytes, &c)
 	if err != nil {
 		return apiConfigData{}, err
@@ -60,20 +56,6 @@ func query(city string) (weatherData, error) {
 }
 
 func main() {
-	// Print working directory for debugging
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Println("Error getting working directory:", err)
-		return
-	}
-	fmt.Println("Current working directory:", wd)
-
-	// Check if the .apiConfig file exists
-	if _, err := os.Stat(".apiConfig"); os.IsNotExist(err) {
-		fmt.Println("The .apiConfig file does not exist")
-		return
-	}
-
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/weather/", func(w http.ResponseWriter, r *http.Request) {
 		city := strings.SplitN(r.URL.Path, "/", 3)[2]
